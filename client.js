@@ -1,17 +1,18 @@
-let url = location.host == 'localhost' ?
-    'ws://localhost:8080/ws' : location.host == 'javascript.local' ?
-        `ws://javascript.local/article/websocket/chat/ws` : // интеграция для разработки с локальным сайтом
-        `wss://javascript.info/article/websocket/chat/ws`; // боевая интеграция с javascript.info
+const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+const socket = new WebSocket(`${protocol}//${location.host}/ws`);
 
-let socket = new WebSocket(url);
+const chatInput = document.querySelector('#chat-input');
+const chatButton = document.querySelector('#chat-button');
 
-// отправка сообщения из формы
-document.forms.publish.onsubmit = function() {
-    let outgoingMessage = this.message.value;
+chatButton.addEventListener('click', (e) => {
+    const message = chatInput.value;
 
-    socket.send(outgoingMessage);
-    return false;
-};
+    if (!message) {
+        return;
+    }
+
+    socket.send(message);
+})
 
 // прослушка входящих сообщений
 socket.onmessage = function(event) {
